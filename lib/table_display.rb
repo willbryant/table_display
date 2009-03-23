@@ -41,6 +41,8 @@ module TableDisplay
       end
     end
     
+    return [] if data.empty?
+    
     # build the table header
     separator_string = "+"
     heading_string   = "|"

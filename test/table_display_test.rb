@@ -146,4 +146,8 @@ END
 END
     # note the strings no longer have quotes, the nil is not shown, and the date format happens to be different
   end
+
+  test "#to_table on an empty array returns an empty result" do
+    assert_equal [], [].to_table
+  end
 end
