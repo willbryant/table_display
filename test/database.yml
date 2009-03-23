@@ -1,0 +1,4 @@
+test:
+  adapter: mysql
+  database: table_display_test
+  username: root

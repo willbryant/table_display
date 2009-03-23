@@ -1,0 +1,4 @@
+this_project:
+  id: 31
+  name: table_display plugin
+  description: "A handy plugin for displaying sets of records in a table format, for easy reading at the console."
