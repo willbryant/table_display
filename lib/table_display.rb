@@ -76,7 +76,7 @@ module TableDisplay
   end
 end
 
-class Object
+module Kernel
   def pt(target, *options)
     puts target.to_table(*options)
   end
