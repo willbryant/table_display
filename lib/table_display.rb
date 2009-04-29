@@ -1,8 +1,8 @@
 module TableDisplay
   def to_table(options = {})
-    extra_methods = (options.delete(:methods) || []).collect(&:to_s)
-    only_attributes = options.delete(:only).collect(&:to_s) if options[:only]
-    except_attributes = options.delete(:except).collect(&:to_s) if options[:except]
+    extra_methods = Array(options.delete(:methods) || []).collect(&:to_s)
+    only_attributes = Array(options.delete(:only)).collect(&:to_s) if options[:only]
+    except_attributes = Array(options.delete(:except)).collect(&:to_s) if options[:except]
     display_inspect = !options.has_key?(:inspect) || options.delete(:inspect)
     raise "unknown options passed to to_table: #{options.keys.to_sentence}" unless options.empty?
     
