@@ -124,6 +124,28 @@ END
 END
   end
   
+  test "#to_table accepts an unnamed list of arguments for column names" do
+    assert_equal <<END.strip, @project.tasks.to_table('id', :due_on, :completed?).join("\n")
++----+------------------+------------+
+| id | due_on           | completed? |
++----+------------------+------------+
+|  1 | Wed, 25 Mar 2009 | true       |
+|  2 | Sun, 05 Apr 2009 | false      |
++----+------------------+------------+
+END
+  end
+  
+  test "#to_table allows auxiliary named arguments with the array format" do
+    assert_equal <<END.strip, @project.tasks.to_table('id', :due_on, :completed?, :inspect => false).join("\n")
++----+------------+------------+
+| id | due_on     | completed? |
++----+------------+------------+
+|  1 | 2009-03-25 | true       |
+|  2 | 2009-04-05 | false      |
++----+------------+------------+
+END
+  end
+  
   test "#to_table also shows any :methods given as columns" do
     assert_equal <<END.strip, @project.tasks.to_table(:methods => [:completed?, 'project_name']).join("\n")
 +----+------------+------------------------+------------------+--------------------------------+--------------------------------+--------------------------------+------------+------------------------+

@@ -59,6 +59,12 @@ Example
 |  2 | "Blog the plugin"      | nil           |
 +----+------------------------+---------------+
 
+# There's a convenient equivalent syntax for displaying an ordered list of columns, like :only and :methods:
+>> puts Customer.find(31).purchases.to_table :id, :description, :met_due_date?
+# which provides:
+>> pt Customer.find(31).purchases, :id, :description, :met_due_date?
+# resulting in the same output as above.
+
 
 # If :inspect => false is used, the values will be shown in #to_s form rather than #inspect form:
 >> pt Customer.find(31).purchases, :only => [:id, :description, :due_on, :completed_at]

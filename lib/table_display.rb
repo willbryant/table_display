@@ -1,10 +1,13 @@
 module TableDisplay
-  def to_table(options = {})
-    extra_methods = Array(options.delete(:methods) || []).collect(&:to_s)
+  def to_table(*args)
+    options = args.last.is_a?(Hash) ? args.pop : {}
+    extra_methods = args.length > 0 ? args.collect(&:to_s) : []
+    extra_methods += Array(options.delete(:methods)).collect(&:to_s) if options[:methods]
     only_attributes = Array(options.delete(:only)).collect(&:to_s) if options[:only]
+    only_attributes ||= [] if args.length > 0
     except_attributes = Array(options.delete(:except)).collect(&:to_s) if options[:except]
-    display_inspect = !options.has_key?(:inspect) || options.delete(:inspect)
-    raise "unknown options passed to to_table: #{options.keys.to_sentence}" unless options.empty?
+    display_inspect = options.nil? || !options.has_key?(:inspect) || options.delete(:inspect)
+    raise "unknown options passed to to_table: #{options.keys.to_sentence}" unless options.blank?
     
     column_lengths = ActiveSupport::OrderedHash.new
     
