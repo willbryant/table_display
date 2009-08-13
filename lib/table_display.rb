@@ -35,8 +35,8 @@ module TableDisplay
       data << column_lengths.collect do |name, max_width|
         if attribute_names.include?(name) || extra_methods.include?(name)
           value = record.send(name)
-          string_value = (display_inspect ? value.inspect : value.to_s)
-          column_lengths[name] = string_value.length if string_value.length > max_width
+          string_value = (display_inspect ? value.inspect : (value.is_a?(String) ? value : value.to_s))
+          column_lengths[name] = string_value.mb_chars.length if string_value.mb_chars.length > max_width
           value.is_a?(Numeric) ? value : string_value # keep Numeric values as-is for now, so we can handle them specially in the output below
         else
           ""
@@ -53,8 +53,8 @@ module TableDisplay
       next unless max_width > 0 # skip any columns we never actually saw
       
       # the column needs to fit the column header as well as the values
-      if attribute.length > max_width
-        column_lengths[attribute] = max_width = attribute.length
+      if attribute.mb_chars.length > max_width
+        column_lengths[attribute] = max_width = attribute.mb_chars.length
       end
       
       separator_string << '-'*(max_width + 2) << '+'
@@ -68,9 +68,9 @@ module TableDisplay
         next unless max_width > 0 # skip any columns we never actually saw
         value = data_row[index]
         if value.is_a?(Numeric)
-          data_string << ' ' << (display_inspect ? value.inspect : value.to_s).rjust(max_width) << ' |'
+          data_string << ' ' << (display_inspect ? value.inspect : value.to_s).mb_chars.rjust(max_width) << ' |'
         else
-          data_string << ' ' << value.ljust(max_width) << ' |'
+          data_string << ' ' << value.mb_chars.ljust(max_width) << ' |'
         end
       end
       rows << data_string

@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'test_helper'
 require 'schema'
 
@@ -167,6 +168,30 @@ END
 +----+------------+----------------------+------------+--------------------------------+--------------------------------+--------------------------------+
 END
     # note the strings no longer have quotes, the nil is not shown, and the date format happens to be different
+  end
+  
+  test "#to_table correctly pads out to match the length in characters of long values with utf-8 sequences" do
+    tasks(:write_a_handy_plugin).update_attribute(:description, "Write a handy plugin \342\200\223 with UTF-8 handling")
+    assert_equal <<END.strip, @project.tasks.to_table(:only => [:id, :description], :inspect => false).join("\n")
++----+--------------------------------------------+
+| id | description                                |
++----+--------------------------------------------+
+|  1 | Write a handy plugin – with UTF-8 handling |
+|  2 | Blog the plugin                            |
++----+--------------------------------------------+
+END
+  end
+
+  test "#to_table correctly pads out short values with utf-8 sequences" do
+    tasks(:blog_the_plugin).update_attribute(:description, "Blog \342\200\223 plugin")
+    assert_equal <<END.strip, @project.tasks.to_table(:only => [:id, :description], :inspect => false).join("\n")
++----+----------------------+
+| id | description          |
++----+----------------------+
+|  1 | Write a handy plugin |
+|  2 | Blog – plugin        |
++----+----------------------+
+END
   end
 
   test "#to_table on an empty array returns an empty result" do

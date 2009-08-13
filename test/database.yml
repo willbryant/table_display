@@ -1,4 +1,3 @@
 test:
-  adapter: mysql
-  database: table_display_test
-  username: root
+  adapter: sqlite3
+  dbfile: table_display_test.db

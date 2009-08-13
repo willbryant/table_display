@@ -1,16 +1,20 @@
-RAILS_ROOT = File.expand_path("../../..")
-if File.exist?("#{RAILS_ROOT}/config/boot.rb")
-  require "#{RAILS_ROOT}/config/boot.rb"
-else
-  require 'rubygems'
-end
+require 'rubygems'
+require "../../../config/boot.rb" if File.exist?("../../../config/boot.rb")
+
+$KCODE = 'u' if RUBY_VERSION < '1.9' # as per railties initializer.rb: set unicode mode for Ruby 1.8 (Ruby 1.9 just works)
 
 require 'test/unit'
-require 'ruby-debug' rescue nil
 require 'active_support'
 require 'active_support/test_case'
 require 'active_record'
 require 'active_record/fixtures'
+
+begin
+  require 'ruby-debug'
+  Debugger.start
+rescue LoadError
+  # ruby-debug not installed, no debugging for you
+end
 
 ENV['RAILS_ENV'] ||= 'test'
 FileUtils.mkdir File.join(File.dirname(__FILE__), "log") rescue nil
