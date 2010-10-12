@@ -1,6 +1,7 @@
 # coding: utf-8
 require 'test_helper'
 require 'schema'
+require 'ostruct'
 
 class Project < ActiveRecord::Base
   has_many :tasks
@@ -125,6 +126,25 @@ END
 END
   end
   
+  test "#to_table keeps the columns in the order given in :only" do
+    assert_equal <<END.strip, @project.tasks.to_table(:only => [:due_on, 'id']).join("\n")
++------------------+----+
+| due_on           | id |
++------------------+----+
+| Wed, 25 Mar 2009 |  1 |
+| Sun, 05 Apr 2009 |  2 |
++------------------+----+
+END
+    assert_equal <<END.strip, @project.tasks.to_table(:only => [:due_on, :id]).join("\n")
++------------------+----+
+| due_on           | id |
++------------------+----+
+| Wed, 25 Mar 2009 |  1 |
+| Sun, 05 Apr 2009 |  2 |
++------------------+----+
+END
+  end
+  
   test "#to_table accepts an unnamed list of arguments for column names" do
     assert_equal <<END.strip, @project.tasks.to_table('id', :due_on, :completed?).join("\n")
 +----+------------------+------------+
@@ -196,5 +216,63 @@ END
 
   test "#to_table on an empty array returns an empty result" do
     assert_equal [], [].to_table
+  end
+  
+  test "#to_table can extract data out of raw hashes" do
+    @records = [{:foo => 1234, :bar => "test"},
+                {:bar => "text", :baz => 5678}]
+    assert_equal <<END.strip, @records.to_table.join("\n")
++------+--------+------+
+| foo  | bar    | baz  |
++------+--------+------+
+| 1234 | "test" | nil  |
+| nil  | "text" | 5678 |
++------+--------+------+
+END
+    assert_equal <<END.strip, @records.to_table(:only => [:bar, :baz]).join("\n")
++--------+------+
+| bar    | baz  |
++--------+------+
+| "test" | nil  |
+| "text" | 5678 |
++--------+------+
+END
+    assert_equal <<END.strip, @records.to_table(:except => [:bar]).join("\n")
++------+------+
+| foo  | baz  |
++------+------+
+| 1234 | nil  |
+| nil  | 5678 |
++------+------+
+END
+  end
+  
+  test "#to_table can extract data out of OpenStruct records" do
+    @records = [OpenStruct.new(:foo => 1234, :bar => "test"),
+                OpenStruct.new(:bar => "text", :baz => 5678)]
+    assert_equal <<END.strip, @records.to_table.join("\n")
++------+--------+------+
+| foo  | bar    | baz  |
++------+--------+------+
+| 1234 | "test" | nil  |
+| nil  | "text" | 5678 |
++------+--------+------+
+END
+    assert_equal <<END.strip, @records.to_table(:only => [:bar, :baz]).join("\n")
++--------+------+
+| bar    | baz  |
++--------+------+
+| "test" | nil  |
+| "text" | 5678 |
++--------+------+
+END
+    assert_equal <<END.strip, @records.to_table(:except => [:bar]).join("\n")
++------+------+
+| foo  | baz  |
++------+------+
+| 1234 | nil  |
+| nil  | 5678 |
++------+------+
+END
   end
 end
