@@ -1,6 +1,6 @@
 # coding: utf-8
-require 'test_helper'
-require 'schema'
+require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'schema'))
 require 'ostruct'
 
 class Project < ActiveRecord::Base
