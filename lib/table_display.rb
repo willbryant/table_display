@@ -26,9 +26,15 @@ module TableDisplay
         if record.respond_to?(:attribute_names)
           # an ActiveModel instance
           attribute_names = record.attribute_names
+        elsif Object.const_defined?(:OpenStruct) && record.is_a?(OpenStruct)
+          # OpenStruct has a crappy API, #inspect will show the attributes but there's no public way to get a list of them!
+          record = record.instance_variable_get("@table")
+          attribute_names = record.keys
+        elsif record.respond_to?(:attributes)
+          # something like an ActiveResource, which doesn't implement attribute_names but does implement attributes
+          attribute_names = record.attributes.keys
         else
           # hopefully something like a hash
-          record = record.instance_variable_get("@table") if Object.const_defined?(:OpenStruct) && record.is_a?(OpenStruct) # OpenStruct has a crappy API, #inspect will show the attributes but there's no public way to get a list of them!
           attribute_names = record.keys
         end
       
