@@ -232,7 +232,11 @@ END
   test "#to_table can extract data out of raw hashes" do
     @records = [{:foo => 1234, :bar => "test"},
                 {:bar => "text", :baz => 5678}]
-    assert_equal <<END.strip, @records.to_table.join("\n")
+    results = @records.to_table.join("\n")
+    assert results.include?('| foo  |')
+    assert results.include?('| bar    |')
+    assert results.include?('| baz  |')
+    assert_equal <<END.strip, @records.to_table(:only => [:foo, :bar, :baz]).join("\n")
 +------+--------+------+
 | foo  | bar    | baz  |
 +------+--------+------+
@@ -261,7 +265,11 @@ END
   test "#to_table can extract data out of OpenStruct records" do
     @records = [OpenStruct.new(:foo => 1234, :bar => "test"),
                 OpenStruct.new(:bar => "text", :baz => 5678)]
-    assert_equal <<END.strip, @records.to_table.join("\n")
+    results = @records.to_table.join("\n")
+    assert results.include?('| foo  |')
+    assert results.include?('| bar    |')
+    assert results.include?('| baz  |')
+    assert_equal <<END.strip, @records.to_table(:only => [:foo, :bar, :baz]).join("\n")
 +------+--------+------+
 | foo  | bar    | baz  |
 +------+--------+------+
