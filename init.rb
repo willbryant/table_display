@@ -10,6 +10,6 @@ ObjectSpace.each_object(Module) {|o| o.send(:include, TableDisplay) if o.ancesto
 ObjectSpace.each_object(Class)  {|o| o.send(:include, TableDisplay) if o.ancestors.include?(Enumerable)}
 
 # Rails 2.3 named_scopes certainly quack like enumerables, but surprisingly they don't themself include Enumerable.
-if ActiveRecord::NamedScope.const_defined?(:Scope)
+if ActiveRecord.const_defined?(:NamedScope) && ActiveRecord::NamedScope.const_defined?(:Scope)
   ActiveRecord::NamedScope::Scope.send(:include, TableDisplay)
 end
