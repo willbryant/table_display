@@ -1,0 +1,5 @@
+.DS_Store
+table_display-*.gem
+Gemfile.lock
+table_display_test.db
+test/log/test.log

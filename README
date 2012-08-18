@@ -2,7 +2,7 @@ Table Display
 =============
 
 Adds support for displaying your ActiveRecord tables, named scopes, collections, or
-plain arrays in a table view when working in script/console, shell, or email template.
+plain arrays in a table view when working in rails console, shell, or email template.
 
 Enumerable#to_table returns the printable strings; Object#pt calls #to_table on its
 first argument and puts out the result.
