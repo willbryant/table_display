@@ -1,5 +1,5 @@
 module TableDisplay
-  def to_table(*args)
+  def to_table_display(*args)
     options = args.last.is_a?(Hash) ? args.pop : {}
     extra_methods = args.length > 0 ? args.collect(&:to_s) : []
     extra_methods += Array(options.delete(:methods)) if options[:methods]
@@ -8,7 +8,7 @@ module TableDisplay
     except_attributes = Array(options.delete(:except)) if options[:except]
     except_attributes = (except_attributes + except_attributes.collect(&:to_s)).uniq if except_attributes.present? # we have to keep string and symbol arguments separate for hashes, which may not have 'indifferent access'
     display_inspect = options.nil? || !options.has_key?(:inspect) || options.delete(:inspect)
-    raise "unknown options passed to to_table: #{options.keys.to_sentence}" unless options.blank?
+    raise "unknown options passed to to_table_display: #{options.keys.to_sentence}" unless options.blank?
     
     column_lengths = ActiveSupport::OrderedHash.new
     
@@ -100,7 +100,7 @@ end
 
 module Kernel
   def pt(target, *options)
-    puts target.to_table(*options)
+    puts target.respond_to?(:to_table_display) ? target.to_table_display(*options) : target
   end
 end
 

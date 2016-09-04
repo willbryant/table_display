@@ -9,13 +9,13 @@ spec = Gem::Specification.new do |gem|
 Adds support for displaying your ActiveRecord tables, named scopes, collections, or
 plain arrays in a table view when working in rails console, shell, or email template.
 
-Enumerable#to_table returns the printable strings; Object#pt calls #to_table on its
+Enumerable#to_table_display returns the printable strings; Object#pt calls #to_table_display on its
 first argument and puts out the result.
 
 Columns you haven't loaded (eg. from using :select) are omitted, and derived/calculated
 columns (eg. again, from using :select) are added.
 
-Both #to_table and Object#pt methods take :only, :except, and :methods which work like
+Both #to_table_display and Object#pt methods take :only, :except, and :methods which work like
 the #to_xml method to change what attributes/methods are output.
 
 The normal output uses #inspect on the data values to make them printable, so you can
@@ -35,4 +35,5 @@ EOF
   gem.add_development_dependency "rake"
   gem.add_development_dependency "sqlite3"
   gem.add_development_dependency "activerecord"
+  gem.add_development_dependency "test-unit"
 end

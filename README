@@ -4,13 +4,13 @@ Table Display
 Adds support for displaying your ActiveRecord tables, named scopes, collections, or
 plain arrays in a table view when working in rails console, shell, or email template.
 
-Enumerable#to_table returns the printable strings; Object#pt calls #to_table on its
+Enumerable#to_table_display returns the printable strings; Object#pt calls #to_table_display on its
 first argument and puts out the result.
 
 Columns you haven't loaded (eg. from using :select) are omitted, and derived/calculated
 columns (eg. again, from using :select) are added.
 
-Both #to_table and Object#pt methods take :only, :except, and :methods which work like
+Both #to_table_display and Object#pt methods take :only, :except, and :methods which work like
 the #to_xml method to change what attributes/methods are output.
 
 The normal output uses #inspect on the data values to make them printable, so you can
@@ -21,8 +21,8 @@ you can pass the option :inspect => false to disable inspection.
 Example
 =======
 
-# You can call the to_table method:
->> puts Project.find(31).tasks.to_table
+# You can call the to_table_display method:
+>> puts Project.find(31).tasks.to_table_display
 +----+------------+------------------------+------------------+--------------------------------+--------------------------------+--------------------------------+
 | id | project_id | description            | due_on           | completed_at                   | created_at                     | updated_at                     |
 +----+------------+------------------------+------------------+--------------------------------+--------------------------------+--------------------------------+
@@ -42,7 +42,7 @@ Example
 
 # Like to_xml, you can pass a :methods option to add the output methods on your models, and you can pass :only or :except
 # to (respectively) show only certain columns or show all except certain columns:
->> puts Customer.find(31).purchases.to_table(:only => [:id, :description], :methods => [:met_due_date?])
+>> puts Customer.find(31).purchases.to_table_display(:only => [:id, :description], :methods => [:met_due_date?])
 +----+------------------------+---------------+
 | id | description            | met_due_date? |
 +----+------------------------+---------------+
@@ -60,7 +60,7 @@ Example
 +----+------------------------+---------------+
 
 # There's a convenient equivalent syntax for displaying an ordered list of columns, like :only and :methods:
->> puts Customer.find(31).purchases.to_table :id, :description, :met_due_date?
+>> puts Customer.find(31).purchases.to_table_display :id, :description, :met_due_date?
 # which provides:
 >> pt Customer.find(31).purchases, :id, :description, :met_due_date?
 # resulting in the same output as above.

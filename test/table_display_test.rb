@@ -39,40 +39,40 @@ class TableDisplayTest < ActiveSupport::TestCase
     @project = projects(:this_project)
   end
   
-  test "#to_table is available on arrays" do
+  test "#to_table_display is available on arrays" do
     assert_nothing_raised do
-      [].to_table
+      [].to_table_display
     end
   end
   
-  test "#to_table is available on ActiveRecord find results" do # which should be arrays, in fact
+  test "#to_table_display is available on ActiveRecord find results" do # which should be arrays, in fact
     assert_nothing_raised do
-      Task.find(:all).to_table
+      Task.find(:all).to_table_display
     end
   end
   
-  test "#to_table is available on ActiveRecord named_scopes" do
+  test "#to_table_display is available on ActiveRecord named_scopes" do
     assert_nothing_raised do
-      Task.completed.to_table
+      Task.completed.to_table_display
     end      
   end
   
-  test "#to_table is available on ActiveRecord association collections" do
+  test "#to_table_display is available on ActiveRecord association collections" do
     assert_nothing_raised do
-      @project.tasks.to_table
+      @project.tasks.to_table_display
     end      
   end
   
-  test "#to_table is available on named scopes in ActiveRecord association collections" do
+  test "#to_table_display is available on named scopes in ActiveRecord association collections" do
     assert_nothing_raised do
-      @project.tasks.completed.to_table
+      @project.tasks.completed.to_table_display
     end      
   end
   
   # we run some simple regression tests to check that everything works as expected
   
-  test "#to_table by default includes all the database columns in database order" do
-    assert_equal <<END.strip, @project.tasks.to_table.join("\n")
+  test "#to_table_display by default includes all the database columns in database order" do
+    assert_equal <<END.strip, @project.tasks.to_table_display.join("\n")
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+
 | id | project_id | description            | due_on           | completed_at              | created_at                | updated_at                |
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+
@@ -82,8 +82,8 @@ class TableDisplayTest < ActiveSupport::TestCase
 END
   end
   
-  test "#to_table by default includes all the database columns in database order even when not called on a typeless array" do
-    assert_equal <<END.strip, @project.tasks.find(:all).to_table.join("\n")
+  test "#to_table_display by default includes all the database columns in database order even when not called on a typeless array" do
+    assert_equal <<END.strip, @project.tasks.find(:all).to_table_display.join("\n")
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+
 | id | project_id | description            | due_on           | completed_at              | created_at                | updated_at                |
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+
@@ -93,8 +93,8 @@ END
 END
   end
   
-  test "#to_table leaves out any attributes not loaded" do
-    assert_equal <<END.strip, @project.tasks.find(:all, :select => "id, project_id, completed_at").to_table.join("\n")
+  test "#to_table_display leaves out any attributes not loaded" do
+    assert_equal <<END.strip, @project.tasks.find(:all, :select => "id, project_id, completed_at").to_table_display.join("\n")
 +----+------------+---------------------------+
 | id | project_id | completed_at              |
 +----+------------+---------------------------+
@@ -104,8 +104,8 @@ END
 END
   end
 
-  test "#to_table also shows any attributes that are not columns on the underlying table" do
-    assert_equal <<END.strip, @project.tasks.find(:all, :joins => :project, :select => "tasks.id, project_id, projects.description AS BigProjectDescription").to_table.join("\n")
+  test "#to_table_display also shows any attributes that are not columns on the underlying table" do
+    assert_equal <<END.strip, @project.tasks.find(:all, :joins => :project, :select => "tasks.id, project_id, projects.description AS BigProjectDescription").to_table_display.join("\n")
 +----+------------+-----------------------------------------------------------------------------------------------------+
 | id | project_id | BigProjectDescription                                                                               |
 +----+------------+-----------------------------------------------------------------------------------------------------+
@@ -115,8 +115,8 @@ END
 END
   end
   
-  test "#to_table excludes any columns named in :except" do
-    assert_equal <<END.strip, @project.tasks.to_table(:except => ['created_at', :completed_at]).join("\n")
+  test "#to_table_display excludes any columns named in :except" do
+    assert_equal <<END.strip, @project.tasks.to_table_display(:except => ['created_at', :completed_at]).join("\n")
 +----+------------+------------------------+------------------+---------------------------+
 | id | project_id | description            | due_on           | updated_at                |
 +----+------------+------------------------+------------------+---------------------------+
@@ -126,8 +126,8 @@ END
 END
   end
   
-  test "#to_table excludes all columns except those named in :only" do
-    assert_equal <<END.strip, @project.tasks.to_table(:only => ['id', :due_on]).join("\n")
+  test "#to_table_display excludes all columns except those named in :only" do
+    assert_equal <<END.strip, @project.tasks.to_table_display(:only => ['id', :due_on]).join("\n")
 +----+------------------+
 | id | due_on           |
 +----+------------------+
@@ -137,8 +137,8 @@ END
 END
   end
   
-  test "#to_table keeps the columns in the order given in :only" do
-    assert_equal <<END.strip, @project.tasks.to_table(:only => [:due_on, 'id']).join("\n")
+  test "#to_table_display keeps the columns in the order given in :only" do
+    assert_equal <<END.strip, @project.tasks.to_table_display(:only => [:due_on, 'id']).join("\n")
 +------------------+----+
 | due_on           | id |
 +------------------+----+
@@ -146,7 +146,7 @@ END
 | Sun, 05 Apr 2009 |  2 |
 +------------------+----+
 END
-    assert_equal <<END.strip, @project.tasks.to_table(:only => [:due_on, :id]).join("\n")
+    assert_equal <<END.strip, @project.tasks.to_table_display(:only => [:due_on, :id]).join("\n")
 +------------------+----+
 | due_on           | id |
 +------------------+----+
@@ -156,8 +156,8 @@ END
 END
   end
   
-  test "#to_table accepts an unnamed list of arguments for column names" do
-    assert_equal <<END.strip, @project.tasks.to_table('id', :due_on, :completed?).join("\n")
+  test "#to_table_display accepts an unnamed list of arguments for column names" do
+    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?).join("\n")
 +----+------------------+------------+
 | id | due_on           | completed? |
 +----+------------------+------------+
@@ -167,8 +167,8 @@ END
 END
   end
   
-  test "#to_table allows auxiliary named arguments with the array format" do
-    assert_equal <<END.strip, @project.tasks.to_table('id', :due_on, :completed?, :inspect => false).join("\n")
+  test "#to_table_display allows auxiliary named arguments with the array format" do
+    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?, :inspect => false).join("\n")
 +----+------------+------------+
 | id | due_on     | completed? |
 +----+------------+------------+
@@ -178,8 +178,8 @@ END
 END
   end
   
-  test "#to_table also shows any :methods given as columns" do
-    assert_equal <<END.strip, @project.tasks.to_table(:methods => [:completed?, 'project_name']).join("\n")
+  test "#to_table_display also shows any :methods given as columns" do
+    assert_equal <<END.strip, @project.tasks.to_table_display(:methods => [:completed?, 'project_name']).join("\n")
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+------------+------------------------+
 | id | project_id | description            | due_on           | completed_at              | created_at                | updated_at                | completed? | project_name           |
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+------------+------------------------+
@@ -189,8 +189,8 @@ END
 END
   end
   
-  test "#to_table shows the #to_s format rather than the #inspect format when :inspect => false is set" do
-    assert_equal <<END.strip, @project.tasks.to_table(:inspect => false).join("\n")
+  test "#to_table_display shows the #to_s format rather than the #inspect format when :inspect => false is set" do
+    assert_equal <<END.strip, @project.tasks.to_table_display(:inspect => false).join("\n")
 +----+------------+----------------------+------------+---------------------------+---------------------------+---------------------------+
 | id | project_id | description          | due_on     | completed_at              | created_at                | updated_at                |
 +----+------------+----------------------+------------+---------------------------+---------------------------+---------------------------+
@@ -201,9 +201,9 @@ END
     # note the strings no longer have quotes, the nil is not shown, and the date format happens to be different
   end
   
-  test "#to_table correctly pads out to match the length in characters of long values with utf-8 sequences" do
+  test "#to_table_display correctly pads out to match the length in characters of long values with utf-8 sequences" do
     tasks(:write_a_handy_plugin).update_attribute(:description, "Write a handy plugin \342\200\223 with UTF-8 handling")
-    assert_equal <<END.strip, @project.tasks.to_table(:only => [:id, :description], :inspect => false).join("\n")
+    assert_equal <<END.strip, @project.tasks.to_table_display(:only => [:id, :description], :inspect => false).join("\n")
 +----+--------------------------------------------+
 | id | description                                |
 +----+--------------------------------------------+
@@ -213,9 +213,9 @@ END
 END
   end
 
-  test "#to_table correctly pads out short values with utf-8 sequences" do
+  test "#to_table_display correctly pads out short values with utf-8 sequences" do
     tasks(:blog_the_plugin).update_attribute(:description, "Blog \342\200\223 plugin")
-    assert_equal <<END.strip, @project.tasks.to_table(:only => [:id, :description], :inspect => false).join("\n")
+    assert_equal <<END.strip, @project.tasks.to_table_display(:only => [:id, :description], :inspect => false).join("\n")
 +----+----------------------+
 | id | description          |
 +----+----------------------+
@@ -225,18 +225,18 @@ END
 END
   end
 
-  test "#to_table on an empty array returns an empty result" do
-    assert_equal [], [].to_table
+  test "#to_table_display on an empty array returns an empty result" do
+    assert_equal [], [].to_table_display
   end
   
-  test "#to_table can extract data out of raw hashes" do
+  test "#to_table_display can extract data out of raw hashes" do
     @records = [{:foo => 1234, :bar => "test"},
                 {:bar => "text", :baz => 5678}]
-    results = @records.to_table.join("\n")
+    results = @records.to_table_display.join("\n")
     assert results.include?('| foo  |')
     assert results.include?('| bar    |')
     assert results.include?('| baz  |')
-    assert_equal <<END.strip, @records.to_table(:only => [:foo, :bar, :baz]).join("\n")
+    assert_equal <<END.strip, @records.to_table_display(:only => [:foo, :bar, :baz]).join("\n")
 +------+--------+------+
 | foo  | bar    | baz  |
 +------+--------+------+
@@ -244,7 +244,7 @@ END
 | nil  | "text" | 5678 |
 +------+--------+------+
 END
-    assert_equal <<END.strip, @records.to_table(:only => [:bar, :baz]).join("\n")
+    assert_equal <<END.strip, @records.to_table_display(:only => [:bar, :baz]).join("\n")
 +--------+------+
 | bar    | baz  |
 +--------+------+
@@ -252,7 +252,7 @@ END
 | "text" | 5678 |
 +--------+------+
 END
-    assert_equal <<END.strip, @records.to_table(:except => [:bar]).join("\n")
+    assert_equal <<END.strip, @records.to_table_display(:except => [:bar]).join("\n")
 +------+------+
 | foo  | baz  |
 +------+------+
@@ -262,14 +262,14 @@ END
 END
   end
   
-  test "#to_table can extract data out of OpenStruct records" do
+  test "#to_table_display can extract data out of OpenStruct records" do
     @records = [OpenStruct.new(:foo => 1234, :bar => "test"),
                 OpenStruct.new(:bar => "text", :baz => 5678)]
-    results = @records.to_table.join("\n")
+    results = @records.to_table_display.join("\n")
     assert results.include?('| foo  |')
     assert results.include?('| bar    |')
     assert results.include?('| baz  |')
-    assert_equal <<END.strip, @records.to_table(:only => [:foo, :bar, :baz]).join("\n")
+    assert_equal <<END.strip, @records.to_table_display(:only => [:foo, :bar, :baz]).join("\n")
 +------+--------+------+
 | foo  | bar    | baz  |
 +------+--------+------+
@@ -277,7 +277,7 @@ END
 | nil  | "text" | 5678 |
 +------+--------+------+
 END
-    assert_equal <<END.strip, @records.to_table(:only => [:bar, :baz]).join("\n")
+    assert_equal <<END.strip, @records.to_table_display(:only => [:bar, :baz]).join("\n")
 +--------+------+
 | bar    | baz  |
 +--------+------+
@@ -285,7 +285,7 @@ END
 | "text" | 5678 |
 +--------+------+
 END
-    assert_equal <<END.strip, @records.to_table(:except => [:bar]).join("\n")
+    assert_equal <<END.strip, @records.to_table_display(:except => [:bar]).join("\n")
 +------+------+
 | foo  | baz  |
 +------+------+
