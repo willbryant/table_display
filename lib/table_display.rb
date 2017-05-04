@@ -83,7 +83,7 @@ module TableDisplay
     rows = [separator_string, heading_string, separator_string]
     data.each do |data_row|
       data_string = "|"
-      column_lengths.each_with_index do |(attribute, max_width), index|
+      column_lengths.each_with_index do |(_attribute, max_width), index|
         next unless max_width > 0 # skip any columns we never actually saw
         value = data_row[index]
         if value.is_a?(Numeric)
