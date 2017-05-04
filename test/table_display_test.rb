@@ -47,7 +47,7 @@ class TableDisplayTest < ActiveSupport::TestCase
   
   test "#to_table_display is available on ActiveRecord find results" do # which should be arrays, in fact
     assert_nothing_raised do
-      Task.find(:all).to_table_display
+      Task.all.to_table_display
     end
   end
   
@@ -83,7 +83,7 @@ END
   end
   
   test "#to_table_display by default includes all the database columns in database order even when not called on a typeless array" do
-    assert_equal <<END.strip, @project.tasks.find(:all).to_table_display.join("\n")
+    assert_equal <<END.strip, @project.tasks.all.to_table_display.join("\n")
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+
 | id | project_id | description            | due_on           | completed_at              | created_at                | updated_at                |
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+
@@ -94,7 +94,7 @@ END
   end
   
   test "#to_table_display leaves out any attributes not loaded" do
-    assert_equal <<END.strip, @project.tasks.find(:all, :select => "id, project_id, completed_at").to_table_display.join("\n")
+    assert_equal <<END.strip, @project.tasks.select("id, project_id, completed_at").to_table_display.join("\n")
 +----+------------+---------------------------+
 | id | project_id | completed_at              |
 +----+------------+---------------------------+
@@ -105,7 +105,7 @@ END
   end
 
   test "#to_table_display also shows any attributes that are not columns on the underlying table" do
-    assert_equal <<END.strip, @project.tasks.find(:all, :joins => :project, :select => "tasks.id, project_id, projects.description AS BigProjectDescription").to_table_display.join("\n")
+    assert_equal <<END.strip, @project.tasks.joins(:project).select("tasks.id, project_id, projects.description AS BigProjectDescription").to_table_display.join("\n")
 +----+------------+-----------------------------------------------------------------------------------------------------+
 | id | project_id | BigProjectDescription                                                                               |
 +----+------------+-----------------------------------------------------------------------------------------------------+
