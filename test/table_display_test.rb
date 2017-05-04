@@ -21,7 +21,7 @@ end
 class Task < ActiveRecord::Base
   belongs_to :project
   
-  scope :completed, :conditions => 'completed_at IS NOT NULL'
+  scope :completed, -> { where('completed_at IS NOT NULL') }
   
   def completed?
     !completed_at.nil?
