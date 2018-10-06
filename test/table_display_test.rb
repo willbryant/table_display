@@ -188,7 +188,36 @@ END
 +----+------------+------------------------+------------------+---------------------------+---------------------------+---------------------------+------------+------------------------+
 END
   end
-  
+
+  test "#to_table_display also shows any named callables given as columns" do
+    instrument = Object.new.tap { |o| o.define_singleton_method(:sample) { |record| "(id #{record.id})" } }
+
+    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?, instrument.method(:sample)).join("\n")
++----+------------------+------------+----------+
+| id | due_on           | completed? | sample   |
++----+------------------+------------+----------+
+|  1 | Wed, 25 Mar 2009 | true       | "(id 1)" |
+|  2 | Sun, 05 Apr 2009 | false      | "(id 2)" |
++----+------------------+------------+----------+
+END
+  end
+
+  test "#to_table_display also shows any unnamed callables given as columns" do
+    instrument = Object.new.tap do |object|
+      object.define_singleton_method(:call) { |record| "(id #{record.id})" }
+      object.define_singleton_method(:to_s) { "arbitrary to_s" }
+    end
+
+    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?, instrument).join("\n")
++----+------------------+------------+----------------+
+| id | due_on           | completed? | arbitrary to_s |
++----+------------------+------------+----------------+
+|  1 | Wed, 25 Mar 2009 | true       | "(id 1)"       |
+|  2 | Sun, 05 Apr 2009 | false      | "(id 2)"       |
++----+------------------+------------+----------------+
+END
+  end
+
   test "#to_table_display shows the #to_s format rather than the #inspect format when :inspect => false is set" do
     assert_equal <<END.strip, @project.tasks.to_table_display(:inspect => false).join("\n")
 +----+------------+----------------------+------------+---------------------------+---------------------------+---------------------------+

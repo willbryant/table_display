@@ -75,6 +75,9 @@ Example
 |  2 | Blog the plugin      | 2009-04-05 |                                |
 +----+----------------------+------------+--------------------------------+
 
+# It is possible to use objects that respond to #call -- such as methods or procs -- to set up columns. They will be
+# passed the record as their sole argument. If these have names (as with methods), those will be used as the headers.
+# Otherwise, the default `to_s` behaviour will be used.
 
 # Note that in all cases, values descending from Numeric are right-aligned, while all other values are left-aligned.
 
