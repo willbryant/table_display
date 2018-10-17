@@ -190,9 +190,12 @@ END
   end
 
   test "#to_table_display also shows any named callables given as columns" do
-    instrument = Object.new.tap { |o| o.define_singleton_method(:sample) { |record| "(id #{record.id})" } }
+    named_callable = Object.new.tap do |object|
+      object.define_singleton_method(:name) { :sample }
+      object.define_singleton_method(:call) { |record| "(id #{record.id})" }
+    end
 
-    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?, instrument.method(:sample)).join("\n")
+    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?, named_callable).join("\n")
 +----+------------------+------------+----------+
 | id | due_on           | completed? | sample   |
 +----+------------------+------------+----------+
@@ -202,19 +205,24 @@ END
 END
   end
 
-  test "#to_table_display also shows any unnamed callables given as columns" do
-    instrument = Object.new.tap do |object|
+  test "#to_table_display shows multiple callables given as columns in the order provided" do
+    callable = Object.new.tap do |object|
       object.define_singleton_method(:call) { |record| "(id #{record.id})" }
       object.define_singleton_method(:to_s) { "arbitrary to_s" }
     end
 
-    assert_equal <<END.strip, @project.tasks.to_table_display('id', :due_on, :completed?, instrument).join("\n")
-+----+------------------+------------+----------------+
-| id | due_on           | completed? | arbitrary to_s |
-+----+------------------+------------+----------------+
-|  1 | Wed, 25 Mar 2009 | true       | "(id 1)"       |
-|  2 | Sun, 05 Apr 2009 | false      | "(id 2)"       |
-+----+------------------+------------+----------------+
+    instrument = Object.new.tap { |o| o.define_singleton_method(:creation) { |record| "(#{record.created_at.to_date})" } }
+
+    due_on_proc = -> (record) { record.due_on }
+    due_on_proc.define_singleton_method(:to_s) { "due_on_proc" }
+
+    assert_equal <<END.strip, @project.tasks.to_table_display('id', due_on_proc, instrument.method(:creation), callable).join("\n")
++----+------------------+----------------+----------------+
+| id | due_on_proc      | creation       | arbitrary to_s |
++----+------------------+----------------+----------------+
+|  1 | Wed, 25 Mar 2009 | "(2009-03-22)" | "(id 1)"       |
+|  2 | Sun, 05 Apr 2009 | "(2009-03-22)" | "(id 2)"       |
++----+------------------+----------------+----------------+
 END
   end
 
