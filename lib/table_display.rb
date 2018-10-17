@@ -1,8 +1,8 @@
 module TableDisplay
   def to_table_display(*args)
     options = args.last.is_a?(Hash) ? args.pop : {}
-    extra_methods = args.length > 0 ? args.collect(&:to_s) : []
-    extra_methods += Array(options.delete(:methods)) if options[:methods]
+    extra_entries = args.collect { |arg| arg.respond_to?(:call) ? arg : arg.to_s }
+    extra_entries += Array(options.delete(:methods)) if options[:methods]
     only_attributes = Array(options.delete(:only)) if options[:only]
     only_attributes ||= [] if args.length > 0
     except_attributes = Array(options.delete(:except)) if options[:except]
@@ -12,7 +12,6 @@ module TableDisplay
     
     column_lengths = ActiveSupport::OrderedHash.new
     
-    data = []
     if only_attributes
       # we've been given an explicit list of attributes to display
       only_attributes.each {|attribute| column_lengths[attribute] = 0}
@@ -50,12 +49,18 @@ module TableDisplay
     end
 
     # also add any :methods given to the list
-    extra_methods.each {|name| column_lengths[name] = 0}
+    extra_entries.each {|name| column_lengths[name] = 0}
     
-    each do |record|
+    data = collect do |record|
       # add the values for all the columns in our list in order they are
-      data << column_lengths.collect do |attribute, max_width|
-        value = record.is_a?(Hash) ? record[attribute] : record.send(attribute)
+      column_lengths.collect do |attribute, max_width|
+        value = if attribute.respond_to?(:call)
+                  attribute.call(record)
+                elsif record.is_a?(Hash)
+                  record[attribute]
+                else
+                  record.send(attribute)
+                end
         string_value = display_inspect ? value.inspect : (value.is_a?(String) ? value : value.to_s)
         column_lengths[attribute] = string_value.mb_chars.length if string_value.mb_chars.length > max_width
         value.is_a?(Numeric) ? value : string_value # keep Numeric values as-is for now, so we can handle them specially in the output below
@@ -69,7 +74,7 @@ module TableDisplay
     heading_string   = "|"
     column_lengths.each do |attribute, max_width|
       next unless max_width > 0 # skip any columns we never actually saw
-      name = attribute.to_s
+      name = (attribute.respond_to?(:name) ? attribute.name : attribute).to_s
       
       # the column needs to fit the column header as well as the values
       if name.mb_chars.length > max_width
