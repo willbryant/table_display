@@ -90,4 +90,8 @@ Otherwise, the default `to_s` behaviour will be used.
 
 Note that in all cases, values whose class descends from `Numeric` are right-aligned, while all other values are left-aligned.
 
+Thanks
+------
+* Michael Fowler (@mkrfowler)
+
 Copyright (c) 2009-2018 Will Bryant, Sekuda Ltd, released under the MIT license
