@@ -1,16 +1,16 @@
 Table Display
 =============
 
-Adds support for displaying your ActiveRecord tables, named scopes, collections, or
+Displays ActiveRecord tables, named scopes, collections, hashes, or
 plain arrays in a table view when working in rails console, shell, or email template.
 
-`Enumerable#to_table_display` returns the printable strings; `Object#pt` calls `#to_table_display`
-on its first argument and puts out the result.
+`TableDisplay.to_table_display` returns the printable strings; `Object#pt` calls
+`TableDisplay.to_table_display` and puts out the result.
 
 Columns you haven't loaded (eg. from using `:select`) are omitted, and derived/calculated
 columns (eg. again, from using `:select`) are added.
 
-Both `#to_table_display` and `Object#pt` methods take `:only`, `:except`, and `:methods` which 
+Both `TableDisplay.to_table_display` and `Object#pt` methods take `:only`, `:except`, and `:methods` which 
 change what attributes/methods are output, like they do on the `#to_xml` method.
 
 The normal output uses `#inspect` on the data values to make them printable, so you can
@@ -23,7 +23,7 @@ Example
 
 You can call the `to_table_display` method:
 
-    >> puts Project.find(31).tasks.to_table_display
+    >> puts TableDisplay.tasks.to_table_display(Project.find(31))
     +----+------------+------------------------+------------------+--------------------------------+--------------------------------+--------------------------------+
     | id | project_id | description            | due_on           | completed_at                   | created_at                     | updated_at                     |
     +----+------------+------------------------+------------------+--------------------------------+--------------------------------+--------------------------------+
@@ -45,7 +45,7 @@ Or equivalently, use `pt` (like `pp`, but in a table):
 Like `to_xml`, you can pass a `:methods` option to add the output methods on your models, and you
 can pass `:only` or `:except` to (respectively) show only certain columns or show all except certain columns:
 
-    >> puts Customer.find(31).purchases.to_table_display(:only => [:id, :description], :methods => [:met_due_date?])
+    >> puts TableDisplay.to_table_display(Customer.find(31).purchases, :only => [:id, :description], :methods => [:met_due_date?])
     +----+------------------------+---------------+
     | id | description            | met_due_date? |
     +----+------------------------+---------------+
@@ -65,7 +65,7 @@ can pass `:only` or `:except` to (respectively) show only certain columns or sho
 
 There's a convenient equivalent syntax for displaying an ordered list of columns, like `:only` and `:methods`:
 
-    >> puts Customer.find(31).purchases.to_table_display :id, :description, :met_due_date?
+    >> puts TableDisplay.to_table_display(Customer.find(31).purchases, :id, :description, :met_due_date?)
 
 which provides:
 
@@ -94,4 +94,4 @@ Thanks
 ------
 * Michael Fowler (@mkrfowler)
 
-Copyright (c) 2009-2018 Will Bryant, Sekuda Ltd, released under the MIT license
+Copyright (c) 2009-2020 Will Bryant, Sekuda Ltd, released under the MIT license
