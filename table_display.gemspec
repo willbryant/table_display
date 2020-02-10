@@ -22,7 +22,6 @@ The normal output uses #inspect on the data values to make them printable, so yo
 see what type the values had.  When that's inconvenient or you'd prefer direct display,
 you can pass the option :inspect => false to disable inspection.
 EOF
-  gem.has_rdoc     = false
   gem.author       = "Will Bryant"
   gem.email        = "will.bryant@gmail.com"
   gem.homepage     = "http://github.com/willbryant/table_display"
