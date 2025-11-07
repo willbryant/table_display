@@ -4,6 +4,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'schema'))
 require 'ostruct'
 
 class Time
+  undef :to_s
+  undef :inspect
+
   def to_s(*args)
     return to_formatted_s(*args) unless args.empty?
     strftime("%Y-%m-%d %H:%M:%S %z")
