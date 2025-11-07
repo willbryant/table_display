@@ -6,11 +6,11 @@ module Enumerable
     only_attributes = Array(options.delete(:only)) if options[:only]
     only_attributes ||= [] if args.length > 0
     except_attributes = Array(options.delete(:except)) if options[:except]
-    except_attributes = (except_attributes + except_attributes.collect(&:to_s)).uniq if except_attributes.present? # we have to keep string and symbol arguments separate for hashes, which may not have 'indifferent access'
+    except_attributes = (except_attributes + except_attributes.collect(&:to_s)).uniq if except_attributes && !except_attributes.empty? # we have to keep string and symbol arguments separate for hashes, which may not have 'indifferent access'
     display_inspect = options.nil? || !options.has_key?(:inspect) || options.delete(:inspect)
-    raise "unknown options passed to to_table_display: #{options.keys.to_sentence}" unless options.blank?
+    raise "unknown options passed to to_table_display: #{options.keys.to_sentence}" unless options.empty?
     
-    column_lengths = ActiveSupport::OrderedHash.new
+    column_lengths = {}
     
     if only_attributes
       # we've been given an explicit list of attributes to display
@@ -39,7 +39,7 @@ module Enumerable
       
         if attribute_names.any? {|name| column_lengths[name].nil?} # optimisation, in most use cases all records will have the same type and the same attributes, so we needn't run this for each - but we do handle varying attribute lists, and attributes that are not columns on the model (calculated columns etc.)
           # for ActiveRecord classes, we look at the .columns explicitly so we can keep them in the right order
-          columns_to_check = record.is_a?(ActiveRecord::Base) ? ((record.class.columns.collect(&:name) & attribute_names) + attribute_names).uniq : attribute_names
+          columns_to_check = Module.const_defined?(:ActiveRecord) && record.is_a?(ActiveRecord::Base) ? ((record.class.columns.collect(&:name) & attribute_names) + attribute_names).uniq : attribute_names
           columns_to_check.each do |name|
             next if (only_attributes && !only_attributes.include?(name)) || (except_attributes && except_attributes.include?(name))
             column_lengths[name] = 0 # the values of columns are the maximum width of value seen; when we come to print out, if the max seen is zero then the attribute has never actually been seen (eg. when a find(:all, :select => ...) has been used to exclude some of the database columns from the resultset), and we hide the column.
@@ -62,7 +62,7 @@ module Enumerable
                   record.send(attribute)
                 end
         string_value = display_inspect ? value.inspect : (value.is_a?(String) ? value : value.to_s)
-        column_lengths[attribute] = string_value.mb_chars.length if string_value.mb_chars.length > max_width
+        column_lengths[attribute] = string_value.length if string_value.length > max_width
         value.is_a?(Numeric) ? value : string_value # keep Numeric values as-is for now, so we can handle them specially in the output below
       end
     end
@@ -77,8 +77,8 @@ module Enumerable
       name = (attribute.respond_to?(:name) ? attribute.name : attribute).to_s
       
       # the column needs to fit the column header as well as the values
-      if name.mb_chars.length > max_width
-        column_lengths[attribute] = max_width = name.mb_chars.length
+      if name.length > max_width
+        column_lengths[attribute] = max_width = name.length
       end
       
       separator_string << '-'*(max_width + 2) << '+'
@@ -92,9 +92,9 @@ module Enumerable
         next unless max_width > 0 # skip any columns we never actually saw
         value = data_row[index]
         if value.is_a?(Numeric)
-          data_string << ' ' << (display_inspect ? value.inspect : value.to_s).mb_chars.rjust(max_width) << ' |'
+          data_string << ' ' << (display_inspect ? value.inspect : value.to_s).rjust(max_width) << ' |'
         else
-          data_string << ' ' << value.mb_chars.ljust(max_width) << ' |'
+          data_string << ' ' << value.ljust(max_width) << ' |'
         end
       end
       rows << data_string
