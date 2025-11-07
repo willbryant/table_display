@@ -15,7 +15,7 @@ change what attributes/methods are output, like they do on the `#to_xml` method.
 
 The normal output uses `#inspect` on the data values to make them printable, so you can
 see what type the values had.  When that's inconvenient or you'd prefer direct display,
-you can pass the option `:inspect => false` to disable inspection.
+you can pass the option `inspect: false` to disable inspection.
 
 
 Example
@@ -45,7 +45,7 @@ Or equivalently, use `pt` (like `pp`, but in a table):
 Like `to_xml`, you can pass a `:methods` option to add the output methods on your models, and you
 can pass `:only` or `:except` to (respectively) show only certain columns or show all except certain columns:
 
-    >> puts Customer.find(31).purchases.to_table_display(:only => [:id, :description], :methods => [:met_due_date?])
+    >> puts Customer.find(31).purchases.to_table_display(only: [:id, :description], methods: [:met_due_date?])
     +----+------------------------+---------------+
     | id | description            | met_due_date? |
     +----+------------------------+---------------+
@@ -55,7 +55,7 @@ can pass `:only` or `:except` to (respectively) show only certain columns or sho
 
 `pt` accepts and passes on all options as well:
 
-    >> pt Customer.find(31).purchases, :only => [:id, :description], :methods => [:met_due_date?]
+    >> pt Customer.find(31).purchases, only: [:id, :description], methods: [:met_due_date?]
     +----+------------------------+---------------+
     | id | description            | met_due_date? |
     +----+------------------------+---------------+
@@ -74,9 +74,9 @@ which provides:
 resulting in the same output as above.
 
 
-If `:inspect => false` is used, the values will be shown in `#to_s` form rather than `#inspect` form:
+If `inspect: false` is used, the values will be shown in `#to_s` form rather than `#inspect` form:
 
-    >> pt Customer.find(31).purchases, :only => [:id, :description, :due_on, :completed_at]
+    >> pt Customer.find(31).purchases, only: [:id, :description, :due_on, :completed_at]
     +----+----------------------+------------+--------------------------------+
     | id | description          | due_on     | completed_at                   |
     +----+----------------------+------------+--------------------------------+
