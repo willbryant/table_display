@@ -35,4 +35,5 @@ EOF
   gem.add_development_dependency "sqlite3"
   gem.add_development_dependency "activerecord"
   gem.add_development_dependency "test-unit"
+  gem.add_development_dependency "ostruct"
 end
